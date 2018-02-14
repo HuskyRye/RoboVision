@@ -2,7 +2,7 @@
 For RoboMaster winter camp, running on RoboMaster infantry
 
 # Environment and equipment requires
-* Opencv > 3.0
+* Opencv 3.0.0 or higher
 
 * DJI Mainfold
 
