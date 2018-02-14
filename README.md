@@ -6,7 +6,7 @@ For RoboMaster winter camp, running on RoboMaster infantry
 
 * DJI Mainfold
 
-* USBCamera = K2SA17 (90 degree distortionless)
+* USB Camera K2SA17 (90 degree distortionless)
 
 # Technology report
 // TODO
