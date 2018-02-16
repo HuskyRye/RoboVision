@@ -12,7 +12,7 @@ void detectArmor()
 	}
 	if (!capture.isOpened())
 		std::cerr << "Camera open error" << std::endl;
-	// capture.set(CV_CAP_PROP_EXPOSURE, -7);		// ÆØ¹â Ä¬ÈÏ -7
+	// capture.set(CV_CAP_PROP_EXPOSURE, -7);		// æ›å…‰é»˜è®¤ -7
 	Enemy_color enemy_color = Enemy_color::BLUE;
 
 	cv::Mat frame;
@@ -56,8 +56,8 @@ void detectArmor()
 			cv::Mat rvec;
 			cv::Mat tvec;
 			cv::solvePnP(armor_points, final_armor.vertex, camera_matrix, camera_distortion, rvec, tvec);
-			float yaw = rvec.at<float>[0][1] + atan((tvec.at<float>[0][0] - 25) / tvec.at<float>[0][2]);
-			send_angle(fd, yaw);
+			double yaw = rvec.at<double>(1) + atan((tvec.at<double>(0) - 25) / tvec.at<double>(2));
+			send_angle(fd, static_cast<float>(yaw));
 		}
 		else if (DEBUG && DEBUG_FINAL_ARMOR) {
 			show_selectArmor = src_img.clone();
