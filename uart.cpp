@@ -215,3 +215,22 @@ void send_angle(int fd, float yaw)
 
 	uart_send(fd, (char*)uart_data, 6);
 }
+
+void send_angle(int fd, float yaw, float pitch)
+{
+	unsigned char uart_data[10];
+	uart_data[0] = 0xEE;
+	t.d = yaw;
+	uart_data[1] = t.data[0];
+	uart_data[2] = t.data[1];
+	uart_data[3] = t.data[2];
+	uart_data[4] = t.data[3];
+	t.d = pitch;
+	uart_data[5] = t.data[0];
+	uart_data[6] = t.data[1];
+	uart_data[7] = t.data[2];
+	uart_data[8] = t.data[3];
+	uart_data[9] = 0xAA;
+
+	uart_send(fd, (char*)uart_data, 10);
+}
