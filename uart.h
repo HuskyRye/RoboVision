@@ -20,6 +20,7 @@ int uart_init(int fd, int speed,int flow_ctrl,int databits,int stopbits,int pari
 int uart_send(int fd, char *send_buf,int data_len);
 void send_pixle(int fd, int pixle);
 void send_angle(int fd, float yaw);
+void send_angle(int fd, float yaw, float pitch);
 
 union turn
 {
