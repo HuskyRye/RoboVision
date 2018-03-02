@@ -32,10 +32,10 @@ void detectArmor()
 	}
 
 	std::vector<cv::Point3f> armor_points;
-	armor_points.emplace_back(cv::Point3f(0.0, 0.0, 0.0));
-	armor_points.emplace_back(cv::Point3f(50, 0.0, 0.0));
-	armor_points.emplace_back(cv::Point3f(50, 40, 0.0));
-	armor_points.emplace_back(cv::Point3f(0.0, 40, 0.0));
+	armor_points.emplace_back(cv::Point3f(-25, -20, 0.0));	// left up
+	armor_points.emplace_back(cv::Point3f(25, -20, 0.0));	// right up
+	armor_points.emplace_back(cv::Point3f(25, 20, 0.0));	// right down
+	armor_points.emplace_back(cv::Point3f(-25, 20, 0.0));	// left down
 
 	double camera_m[] = { 540.66275, 0, 309.8505, 0, 543.3125, 237.8745, 0, 0, 1 };
 	cv::Mat camera_matrix(3, 3, CV_64F, camera_m);
@@ -56,8 +56,31 @@ void detectArmor()
 			cv::Mat rvec;
 			cv::Mat tvec;
 			cv::solvePnP(armor_points, final_armor.vertex, camera_matrix, camera_distortion, rvec, tvec);
-			double yaw = rvec.at<double>(1) + atan((tvec.at<double>(0) - 25) / tvec.at<double>(2));
-			send_angle(fd, static_cast<float>(yaw));
+			
+			double rm[9];
+			cv::Mat rmat(3, 3, CV_64FC1, rm);
+			cv::Rodrigues(rvec, rmat);	
+			double r11 = rmat.at<double>(0, 0);
+			double r21 = rmat.at<double>(1, 0);
+			double r31 = rmat.at<double>(2, 0);
+			double r32 = rmat.at<double>(2, 1);
+			double r33 = rmat.at<double>(2, 2);
+			
+			const double PI = 3.141592653;
+			const double bullet_speed = 10.0;	
+			const double gimble_offset = 3.3;
+			
+			double xyz[3] = {tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2)};
+			double yaw = atan2(r21, r11) / PI * 180 + atan2(xyz[0], xyz[2]);
+			double distance = sqrt((xyz[0] * xyz[0] + xyz[2] * xyz[2]);
+			double time = distance / 1000.0 / bullet_speed;
+			double gravity_offset = 0.5 * 9.8 * time * time * 1000;
+			double pitch = atan2(-r31, sqrt(r32*r32 + r33*r33)) / PI * 180;	
+
+			xyz[1] -= gravity_offset + gimble_offset;
+			double pitch = atan2(-xyz[1], distance);
+						
+			send_angle(fd, static_cast<float>(yaw), static_cast<float>(pitch));
 		}
 		else if (DEBUG && DEBUG_FINAL_ARMOR) {
 			show_selectArmor = src_img.clone();
